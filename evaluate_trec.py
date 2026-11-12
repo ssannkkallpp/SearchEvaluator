@@ -1,4 +1,4 @@
-"""Evaluate saved BM25/HNSW rankings with official trec_eval; compare Python scores."""
+"""Evaluate saved BM25, HNSW, and re-ranking runs with official trec_eval."""
 import csv
 import subprocess
 from pathlib import Path
@@ -25,7 +25,7 @@ def main():
                     f.write(f'{qid} 0 {did} {rel}\n')
         for run in sorted(Path(C.RUN_DIR).glob(f'{name}.*.run')):
             system = run.name[len(name) + 1:-4]
-            if not system.startswith(('bm25', 'hnsw')):
+            if not system.startswith(('bm25', 'hnsw', 'rerank')):
                 continue
             level = C.DL_BINARY_REL_LEVEL if name in C.GRADED_SETS else 1
             calls = [(['-l', str(level), '-M', '10', '-m', 'recip_rank'],

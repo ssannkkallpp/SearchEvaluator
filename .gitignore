@@ -3,6 +3,7 @@
 /work/bm25_index/
 /work/hnsw/
 /work/runs/
+/work/smoke_runs/
 /work/results/**/*.qrels
 
 # Local assignment reference and redundant archive

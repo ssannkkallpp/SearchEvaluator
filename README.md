@@ -68,7 +68,7 @@ A3_DATA=/tmp/synth A3_WORK=/tmp/synth_work ./run_all.sh
 
 BM25 and HNSW (M=8, efConstruction=200, efSearch=50/100/200) have
 been run on the supplied one-million-passage subset. BM25-to-embedding
-re-ranking is not implemented yet.
+re-ranking is implemented in `rerank.py`.
 
 Create a virtual environment and install the recorded dependencies:
 
@@ -123,3 +123,30 @@ differences recorded in `differences.csv`.
 Tracked `work/logs/` files record build/search performance. Tracked result files
 record both the initial Python comparison and official trec_eval evaluation;
 normalized copies of the source judgments remain local.
+
+## BM25 candidate re-ranking
+
+`rerank.py` reuses the saved BM25 index, retrieves up to 1,000 candidates per
+query, and sorts their supplied embeddings by dot product with the query vector.
+It saves the top 100. Equal similarities retain BM25 order in the run file;
+`trec_eval` applies its own score-tie ordering during evaluation.
+
+```bash
+# Optional small run; outputs stay separate from full evaluation runs.
+OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 python rerank.py --limit 3
+
+# Complete all three query sets, then evaluate all three approaches.
+OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 python rerank.py --candidates 1000
+python evaluate_trec.py
+```
+
+Use `--candidates 100` to compare a smaller candidate pool. `--depth` defaults
+to 100 and must not exceed the candidate count. The script checks query coverage,
+embedding dimensions, duplicate embedding IDs, and missing passage embeddings.
+Full runs are saved as `work/runs/<set>.rerank_k1000.run`; smoke runs are under
+`work/smoke_runs/`. Timing logs include BM25 retrieval, embedding lookup/scoring/
+sorting, combined search latency, load time, and peak process RSS. Query latency
+excludes loading and run-file serialization. Thread environment settings are
+recorded in the log; the commands above restrict the numerical backend to one
+thread where those environment variables are supported. No new dependency or
+HNSW index is required.
