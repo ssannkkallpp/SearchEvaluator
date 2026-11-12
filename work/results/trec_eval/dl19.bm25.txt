@@ -1,0 +1,7 @@
+# trec_eval/trec_eval -c -l 2 -M 10 -m recip_rank work/results/trec_eval/dl19.qrels work/runs/dl19.bm25.run
+recip_rank            	all	0.6159
+# trec_eval/trec_eval -c -l 2 -m recall.100 work/results/trec_eval/dl19.qrels work/runs/dl19.bm25.run
+recall_100            	all	0.5486
+# trec_eval/trec_eval -c -m ndcg_cut.10,100 work/results/trec_eval/dl19.qrels work/runs/dl19.bm25.run
+ndcg_cut_10           	all	0.4709
+ndcg_cut_100          	all	0.5340

@@ -1,0 +1,13 @@
+{
+  "system": "hnsw",
+  "M": 8,
+  "efConstruction": 200,
+  "build_s": 97.99069862499891,
+  "build_threads": 10,
+  "n_vectors": 1000000,
+  "dim": 384,
+  "index_disk_mb": 1541.6781482696533,
+  "vectors_mb": 1464.84375,
+  "graph_mb": 76.83439826965332,
+  "peak_rss_mb": 3057.8125
+}
