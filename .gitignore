@@ -1,21 +1,20 @@
-# Local data, indexes, and generated retrieval rankings
+# Local datasets and generated artifacts
 /data/
-/work/bm25_index/
-/work/hnsw/
-/work/runs/
-/work/smoke_runs/
-/work/results/**/*.qrels
+/work/
 
-# Local assignment reference and redundant archive
-/assignment_spec.md
-/bm25_hnsw.zip
+# Local assignment reference
+/docs/assignment_spec.md
 
-# External tool checkout (see README for pinned installation)
-/trec_eval/
-
-# Python environment and system files
+# Python environments and generated caches
 /.venv/
 /venv/
 __pycache__/
 *.py[cod]
 .DS_Store
+
+# Local secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key

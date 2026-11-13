@@ -4,21 +4,20 @@ import subprocess
 from pathlib import Path
 
 import config as C
-from compare_retrieval import load_judgments
+from common import load_qrels
 
 
 def main():
+    if not Path(C.TREC_EVAL).is_file():
+        raise FileNotFoundError(f'trec_eval executable not found: {C.TREC_EVAL}. Set TREC_EVAL to its path.')
     output = Path(C.RESULT_DIR) / 'trec_eval'
     output.mkdir(parents=True, exist_ok=True)
-    previous_path = Path(C.RESULT_DIR) / 'comparison.csv'
-    previous = {}
-    if previous_path.exists():
-        with previous_path.open() as f:
-            previous = {(r['set'], r['system']): r for r in csv.DictReader(f)}
-    rows, deltas = [], []
+    rows = []
     for name, source in C.QUERY_SETS.items():
         qrels = output / f'{name}.qrels'
-        judgments = load_judgments(source)
+        judgments = load_qrels(source)
+        if not judgments:
+            raise ValueError(f"No judgments found in {source}")
         with qrels.open('w') as f:
             for qid, docs in judgments.items():
                 for did, rel in docs.items():
@@ -49,20 +48,13 @@ def main():
                         row[mapping[metric]] = float(value)
             (output / f'{name}.{system}.txt').write_text('\n'.join(raw) + '\n')
             rows.append(row)
-            old = previous.get((name, system))
-            if old:
-                for metric, value in row.items():
-                    if metric not in ('set', 'system'):
-                        deltas.append({'set': name, 'system': system, 'metric': metric,
-                                       'python': float(old[metric]), 'trec_eval': value,
-                                       'difference': value - float(old[metric])})
-    for filename, records in [('results.csv', rows), ('differences.csv', deltas)]:
-        if records:
-            fields = list(dict.fromkeys(k for row in records for k in row))
-            with (output / filename).open('w', newline='') as f:
-                writer = csv.DictWriter(f, fieldnames=fields)
-                writer.writeheader()
-                writer.writerows(records)
+    if not rows:
+        raise FileNotFoundError(f'No retrieval runs found in {C.RUN_DIR}')
+    fields = list(dict.fromkeys(k for row in rows for k in row))
+    with (output / 'results.csv').open('w', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(rows)
     md = []
     for name in C.QUERY_SETS:
         cols = ['MRR@10', 'Recall@100'] + (['NDCG@10', 'NDCG@100']
@@ -75,13 +67,7 @@ def main():
                           ' | '.join(f'{row[c]:.4f}' for c in cols) + ' |')
     (output / 'tables.md').write_text('\n'.join(md) + '\n')
     print('\n'.join(md))
-    if deltas:
-        print('\nMaximum absolute difference:', max(abs(d['difference']) for d in deltas))
-        print('Differences > 0.0001:')
-        for d in deltas:
-            if abs(d['difference']) > 0.0001:
-                print(d)
-    print(f'\nSaved official results and comparisons to {output}')
+    print(f'\nSaved official results to {output}')
 
 
 if __name__ == '__main__':

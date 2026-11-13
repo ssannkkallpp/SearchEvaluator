@@ -32,7 +32,11 @@ RUN_DEPTH = 100
 BM25_K1 = 0.9
 BM25_B = 0.4
 
-TREC_EVAL = os.environ.get("TREC_EVAL", "trec_eval/trec_eval")
+# Keep the external tool outside the project; override this path on other machines.
+TREC_EVAL = os.environ.get(
+    "TREC_EVAL",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "search_tools", "trec_eval", "trec_eval"),
+)
 
 BM25_DIR = os.path.join(WORK_DIR, "bm25_index")
 HNSW_DIR = os.path.join(WORK_DIR, "hnsw")

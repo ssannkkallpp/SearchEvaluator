@@ -1,6 +1,0 @@
-# trec_eval/trec_eval -c -l 1 -M 10 -m recip_rank work/results/trec_eval/dev.qrels work/runs/dev.hnsw_M8_efc200_efs50.run
-recip_rank            	all	0.5072
-# trec_eval/trec_eval -c -l 1 -m recall.100 work/results/trec_eval/dev.qrels work/runs/dev.hnsw_M8_efc200_efs50.run
-recall_100            	all	0.8111
-# trec_eval/trec_eval -c -M 100 -m map work/results/trec_eval/dev.qrels work/runs/dev.hnsw_M8_efc200_efs50.run
-map                   	all	0.5058
