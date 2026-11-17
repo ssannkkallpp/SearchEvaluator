@@ -13,6 +13,7 @@ embedding dot product. All quality evaluation uses official `trec_eval`.
 | `bm25.py` | Build and search the subset BM25 index |
 | `dense.py` | Build and search a FAISS HNSW index using dot product |
 | `rerank.py` | Re-rank BM25 candidates using supplied embeddings |
+| `fusion.py` | Fuse saved BM25 and HNSW runs (RRF + CombSUM baseline) |
 | `evaluate_trec.py` | Evaluate saved rankings and generate quality tables |
 | `run_all.sh` | Rebuild and run all three systems, then evaluate |
 
@@ -58,6 +59,7 @@ python bm25.py search
 python dense.py build --M 8 --efc 200
 python dense.py search --M 8 --efc 200 --efs 50 100 200
 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 python rerank.py --candidates 1000
+python fusion.py --k 10 60 100
 python evaluate_trec.py
 ```
 

@@ -12,4 +12,5 @@ PY="${PYTHON:-python}"
 "$PY" dense.py build --M 8 --efc 200
 "$PY" dense.py search --M 8 --efc 200 --efs 50 100 200
 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 "$PY" rerank.py --candidates 1000
+"$PY" fusion.py --k 10 60 100
 "$PY" evaluate_trec.py
