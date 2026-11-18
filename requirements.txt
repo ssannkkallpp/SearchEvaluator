@@ -4,3 +4,4 @@ scipy==1.18.1
 scikit-learn==1.9.1
 h5py==3.16.0
 faiss-cpu==1.16.0
+matplotlib==3.11.2

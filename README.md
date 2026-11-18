@@ -15,7 +15,9 @@ embedding dot product. All quality evaluation uses official `trec_eval`.
 | `rerank.py` | Re-rank BM25 candidates using supplied embeddings |
 | `fusion.py` | Fuse saved BM25 and HNSW runs (RRF + CombSUM baseline) |
 | `evaluate_trec.py` | Evaluate saved rankings and generate quality tables |
-| `run_all.sh` | Rebuild and run all three systems, then evaluate |
+| `experiments.py` | Print existing quality, latency, build, and memory results |
+| `additional_experiments.py` | Run partial reranking and query-length experiments; generate plots |
+| `run_all.sh` | Build indexes, run the main systems and fusion, evaluate, and print results |
 
 ## Setup
 
@@ -65,11 +67,29 @@ python evaluate_trec.py
 
 Existing indexes can be reused: omit the build commands. To rebuild and run the
 whole pipeline, activate the environment and run `./run_all.sh`.
+This runs the main experiments; run the additional experiments separately with
+the command below. Existing main outputs are overwritten. Set `PYTHON` to select
+the runner's interpreter, for example `PYTHON=.venv/bin/python ./run_all.sh`.
 
 Re-ranking returns the top 100 of up to 1,000 BM25 candidates by default.
 `--candidates` and `--depth` are configurable, with depth <= candidates.
 Equal dot products retain BM25 order in the saved ranking. Missing embeddings
 produce an error. Optional `--limit 3` runs a smoke test with separate outputs.
+
+## Additional experiments (reuse built indexes)
+
+```bash
+OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 python additional_experiments.py
+```
+
+This reranks only the first 10, 20, ..., 100 positions of a fixed BM25 top-100
+list, preserving its remaining order. It also compares BM25, HNSW efSearch=200,
+and the top-1000 reranker at each dataset's two most frequent query lengths.
+Every invocation writes fresh rankings, official per-query evaluations, CSVs,
+and PNG/PDF plots to a unique folder under `work/additional_experiments/`.
+It does not rebuild or modify indexes, or read existing retrieval runs.
+Run-file scores encode rank order so the evaluator preserves the partially
+reranked list. Recall@100 is checked to remain unchanged for partial reranking.
 
 ## Outputs and evaluation
 
@@ -80,6 +100,7 @@ produce an error. Optional `--limit 3` runs a smoke test with separate outputs.
 | `work/runs/` | Full-system TREC rankings |
 | `work/logs/` | Build/search timing and memory logs |
 | `work/results/trec_eval/` | Official CSV scores, Markdown tables, raw commands/output, normalized qrels |
+| `work/additional_experiments/<unique-run>/` | Additional experiment rankings, evaluations, CSV data, and PNG/PDF plots in `plots/` |
 
 DL19/DL20 use MRR@10, Recall@100, NDCG@10 and NDCG@100. Dev uses MRR@10,
 Recall@100 and MAP on the available depth-100 rankings. DL binary relevance
