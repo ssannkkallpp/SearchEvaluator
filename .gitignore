@@ -18,3 +18,6 @@ __pycache__/
 !.env.example
 *.pem
 *.key
+
+# Local experiment outputs
+/experiments/runs/

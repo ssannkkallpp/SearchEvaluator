@@ -24,7 +24,7 @@ def main():
                     f.write(f'{qid} 0 {did} {rel}\n')
         for run in sorted(Path(C.RUN_DIR).glob(f'{name}.*.run')):
             system = run.name[len(name) + 1:-4]
-            if not system.startswith(('bm25', 'hnsw', 'rerank')):
+            if not system.startswith(('bm25', 'hnsw', 'rerank', 'rrf', 'combsum')):
                 continue
             level = C.DL_BINARY_REL_LEVEL if name in C.GRADED_SETS else 1
             calls = [(['-l', str(level), '-M', '10', '-m', 'recip_rank'],
